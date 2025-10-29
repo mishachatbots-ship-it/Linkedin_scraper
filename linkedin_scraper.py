@@ -19,6 +19,8 @@ def url_list_proc(file: str):
         url_list = f.read().split(',')
     prefix = "https://ru."
     for n, i in enumerate(url_list):
+        if i == '':
+            break
         url = i[i.index('linkedin'):]
         if "?" in url:
             url = url[:url.index('?')]
@@ -102,9 +104,10 @@ def overview(url: str, proxies: dict, headers: dict, max_retries: int = 10):
 
 def main(
         input_file: str = "url_list.txt",
-        output_file: str = "output_decodo.json",
+        output_file: str = "output.json",
         username: str = "",
-        password: str = ""):
+        password: str = "",
+        proxies: dict = {}):
 
     url_list = url_list_proc(file=input_file)
     with open(output_file, "w", encoding="utf-8") as f:
@@ -112,8 +115,8 @@ def main(
     res = []
     for n, u in enumerate(url_list, start=1):
         try:
-            proxies = make_proxies(username, password)
-            #             proxies = {} # if you don't need proxies
+            if username and password:
+                proxies = make_proxies(username, password)
             headers = headers_creation(u)
             result = overview(url=u, proxies=proxies, headers=headers)
             res.append(result)
@@ -136,11 +139,12 @@ if __name__ == "__main__":
     PASSWORD = ''  # pass decodo
     PORT = '10001'  # port decodo
     url_list = "url_list.txt" # list wirh URL-s
-    output_file = "output_decodo.json" #JSON for result
+    output_file = "output.json" #JSON for result
 
     main(
         input_file=url_list,
         output_file=output_file,
         username=USERNAME,
         password=PASSWORD,
+        proxies = {},
     )
